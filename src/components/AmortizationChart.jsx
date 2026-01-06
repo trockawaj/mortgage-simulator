@@ -6,15 +6,17 @@ const CustomTooltip = ({ active, payload, label }) => {
         return (
             <div className="bg-gray-800 border border-gray-700 p-3 rounded shadow-lg text-sm">
                 <p className="text-gray-300 mb-1">{label}ヶ月目 ({Math.floor(label / 12)}年{label % 12}ヶ月)</p>
-                <p className="text-indigo-400">
-                    ローン残高: {payload[0].value.toLocaleString()} 円
-                </p>
-                <p className="text-emerald-400">
-                    利息累計: {payload[1].value.toLocaleString()} 円
-                </p>
-                <p className="text-blue-400">
-                    元金返済累計: {payload[2].value.toLocaleString()} 円
-                </p>
+                <div className="space-y-1">
+                    <p className="text-indigo-400">
+                        ローン残高: {payload[0]?.value?.toLocaleString() ?? 0} 円
+                    </p>
+                    <p className="text-emerald-400">
+                        利息累計: {payload[1]?.value?.toLocaleString() ?? 0} 円
+                    </p>
+                    <p className="text-blue-400">
+                        元金返済累計: {payload[2]?.value?.toLocaleString() ?? 0} 円
+                    </p>
+                </div>
             </div>
         );
     }
@@ -30,13 +32,12 @@ const AmortizationChart = ({ data, educationPeriods = [], startAge = 35 }) => {
 
     if (!data || data.length === 0) return null;
 
-    // クライアントサイドでのマウントが完了するまでレンダリングしない（サーバーサイドレンダリング時のサイズ不整合回避）
     if (!isMounted) {
         return <div className="bg-gray-800 rounded-2xl h-[450px] animate-pulse"></div>;
     }
 
     return (
-        <div className="bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-700/50 h-[450px] w-full min-h-[450px]">
+        <div className="bg-gray-800 rounded-2xl p-6 shadow-xl border border-gray-700/50">
             <h2 className="text-xl font-bold text-white mb-6 border-b border-gray-700 pb-2 flex justify-between items-end">
                 <span>返済推移グラフ</span>
                 <span className="text-xs font-normal text-gray-400">
@@ -45,9 +46,10 @@ const AmortizationChart = ({ data, educationPeriods = [], startAge = 35 }) => {
                     期間目安
                 </span>
             </h2>
-            {/* 親要素の高さ(h-[450px])から見出し等の高さを引いた残りをグラフ領域にするため、明示的に高さを指定するかflexを使う */}
-            <div style={{ width: '100%', height: '350px' }}>
-                <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+
+            {/* User requested strict inline styles to prevent size calculation errors */}
+            <div style={{ width: '100%', height: '400px', minHeight: '400px' }}>
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} debounce={50}>
                     <AreaChart
                         data={data}
                         margin={{
@@ -68,7 +70,7 @@ const AmortizationChart = ({ data, educationPeriods = [], startAge = 35 }) => {
                             dataKey="month"
                             stroke="#9ca3af"
                             tickFormatter={(val) => {
-                                if (val % 60 === 0 || val === 0) { // 5年ごと
+                                if (val % 60 === 0 || val === 0) {
                                     const yearsPassed = val / 12;
                                     return `${yearsPassed}年 (${startAge + yearsPassed}歳)`;
                                 }
@@ -95,7 +97,6 @@ const AmortizationChart = ({ data, educationPeriods = [], startAge = 35 }) => {
                             name="ローン残高"
                         />
 
-                        {/* 教育費期間のハイライト */}
                         {educationPeriods.map((period, index) => (
                             <ReferenceArea
                                 key={index}
@@ -106,7 +107,7 @@ const AmortizationChart = ({ data, educationPeriods = [], startAge = 35 }) => {
                                 label={{
                                     value: period.label,
                                     position: 'insideTop',
-                                    fill: period.type === 'high_school' ? '#fbcfe8' : '#c7d2fe', // light pink or light indigo
+                                    fill: period.type === 'high_school' ? '#fbcfe8' : '#c7d2fe',
                                     fontSize: 12
                                 }}
                             />

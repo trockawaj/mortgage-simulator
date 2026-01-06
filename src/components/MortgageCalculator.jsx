@@ -22,7 +22,13 @@ const MortgageCalculator = () => {
         costOther: 0,
     });
 
-    // 子供の人数state
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
+    // ... (rest of state items: childCount, result, etc.)
     const [childCount, setChildCount] = useState(1);
 
     const [result, setResult] = useState(null);
@@ -75,6 +81,10 @@ const MortgageCalculator = () => {
     const loadPlan = (plan) => {
         setValues(plan.values);
     };
+
+    if (!isMounted) {
+        return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>;
+    }
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
