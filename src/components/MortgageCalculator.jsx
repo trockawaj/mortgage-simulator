@@ -6,12 +6,14 @@ import AdPlaceholder from './AdPlaceholder';
 import EducationCost from './EducationCost';
 import { calculateMonthlyPayment, calculateTotalPayment, generateAmortizationSchedule } from '../utils/calculations';
 import { Save, Trash2, ArrowRight } from 'lucide-react';
+import { calculateEducationPeriods } from '../utils/education';
 
 const MortgageCalculator = () => {
     const [values, setValues] = useState({
         principal: 3000,
         rate: 1.2,
         years: 35,
+        startAge: 35, // デフォルト35歳
         costMobile: 10000,
         costUtility: 25000,
         costCar: 10000,
@@ -24,6 +26,7 @@ const MortgageCalculator = () => {
     const [result, setResult] = useState(null);
     const [schedule, setSchedule] = useState([]);
     const [savedPlans, setSavedPlans] = useState([]);
+    const [educationPeriods, setEducationPeriods] = useState([]);
 
     useEffect(() => {
         const monthlyPayment = calculateMonthlyPayment(values.principal, values.rate, values.years);
@@ -41,7 +44,11 @@ const MortgageCalculator = () => {
             totalMonthlyCost,
         });
         setSchedule(sched);
-    }, [values]);
+
+        // 教育費期間再計算
+        const periods = calculateEducationPeriods(childCount, values.startAge || 35, values.years);
+        setEducationPeriods(periods);
+    }, [values, childCount]);
 
     const savePlan = () => {
         const newPlan = {
@@ -88,7 +95,11 @@ const MortgageCalculator = () => {
                     </div>
 
                     {/* グラフの背景色などもライトテーマ用に要調整だが、AmortizationChart内部で対応する */}
-                    <AmortizationChart data={schedule} />
+                    <AmortizationChart
+                        data={schedule}
+                        educationPeriods={educationPeriods}
+                        startAge={values.startAge || 35}
+                    />
 
                     <AdPlaceholder format="horizontal" />
                 </div>
