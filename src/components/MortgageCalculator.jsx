@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
 import InputForm from './InputForm';
 import ResultsDisplay from './ResultsDisplay';
 import AmortizationChart from './AmortizationChart';
 import AdPlaceholder from './AdPlaceholder';
 import EducationCost from './EducationCost';
+import PrintReport from './PrintReport';
 import { calculateMonthlyPayment, calculateTotalPayment, generateAmortizationSchedule } from '../utils/calculations';
-import { Save, Trash2, ArrowRight } from 'lucide-react';
+import { Save, Trash2, ArrowRight, Printer } from 'lucide-react';
 import { calculateEducationPeriods } from '../utils/education';
 
 const MortgageCalculator = () => {
@@ -27,6 +29,12 @@ const MortgageCalculator = () => {
     const [schedule, setSchedule] = useState([]);
     const [savedPlans, setSavedPlans] = useState([]);
     const [educationPeriods, setEducationPeriods] = useState([]);
+
+    const componentRef = useRef();
+    const handlePrint = useReactToPrint({
+        contentRef: componentRef,
+        documentTitle: 'mortgage-simulation-report',
+    });
 
     useEffect(() => {
         const monthlyPayment = calculateMonthlyPayment(values.principal, values.rate, values.years);
@@ -70,6 +78,16 @@ const MortgageCalculator = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            {/* 印刷用コンポーネント (非表示) */}
+            <div style={{ display: 'none' }}>
+                <PrintReport
+                    ref={componentRef}
+                    values={values}
+                    result={result}
+                    schedule={schedule}
+                    educationPeriods={educationPeriods}
+                />
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Main Calculation Area */}
@@ -82,13 +100,20 @@ const MortgageCalculator = () => {
                             {/* 教育費シミュレーションをここに配置 (SPレイアウト等考慮するとResultの下が良い) */}
                             <EducationCost childCount={childCount} onChange={setChildCount} />
 
-                            <div className="flex justify-end">
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    onClick={handlePrint}
+                                    className="flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition-colors font-medium shadow-lg hover:shadow-gray-500/30"
+                                >
+                                    <Printer size={18} className="mr-2" />
+                                    PDF保存
+                                </button>
                                 <button
                                     onClick={savePlan}
                                     className="flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors font-medium shadow-lg hover:shadow-indigo-500/30"
                                 >
                                     <Save size={18} className="mr-2" />
-                                    現在のプランを保存・比較
+                                    プラン保存
                                 </button>
                             </div>
                         </div>

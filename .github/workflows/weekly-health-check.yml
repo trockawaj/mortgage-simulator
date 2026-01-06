@@ -1,0 +1,38 @@
+name: Weekly Health Check
+
+on:
+  schedule:
+    # 毎週月曜日の朝9時 (JST) -> UTCでは日曜の24:00 (0:00)
+    - cron: '0 0 * * 1'
+  workflow_dispatch: # 手動実行用
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install Dependencies
+        run: npm ci
+        
+      - name: Build Project
+        run: npm run build
+        
+      - name: Check Artifact Size (Basic Sanity Check)
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Build failed: dist folder not found"
+            exit 1
+          fi
+          echo "Build successful. Checking index.html existence..."
+          if [ ! -f "dist/index.html" ]; then
+             echo "Critical: index.html missing!"
+             exit 1
+          fi
+          echo "Health Check Passed!"
