@@ -38,7 +38,7 @@ const AmortizationChart = ({ data, educationPeriods = [], startAge = 35 }) => {
                     期間目安
                 </span>
             </h2>
-            <ResponsiveContainer width="100%" height="85%" minWidth={0}>
+            <ResponsiveContainer width="100%" height="85%" minWidth={0} debounce={50}>
                 <AreaChart
                     data={data}
                     margin={{
