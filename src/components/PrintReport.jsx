@@ -30,18 +30,18 @@ const PrintReport = forwardRef(({ values, result, schedule, educationPeriods = [
                 <div>
                     <h2>シミュレーション条件</h2>
                     <div className="space-y-2">
-                        <div className="row"><span>借入金額</span> <strong>{values.principal}万円</strong></div>
-                        <div className="row"><span>金利</span> <strong>{values.rate}%</strong></div>
-                        <div className="row"><span>返済期間</span> <strong>{values.years}年</strong></div>
-                        <div className="row"><span>返済開始年齢</span> <strong>{values.startAge || 35}歳</strong></div>
+                        <div className="row"><span>借入金額</span> <strong>{values?.principal ?? 0}万円</strong></div>
+                        <div className="row"><span>金利</span> <strong>{values?.rate ?? 0}%</strong></div>
+                        <div className="row"><span>返済期間</span> <strong>{values?.years ?? 0}年</strong></div>
+                        <div className="row"><span>返済開始年齢</span> <strong>{values?.startAge ?? 35}歳</strong></div>
                     </div>
                 </div>
                 <div>
                     <h2>月々の支払目安</h2>
                     <div className="space-y-2">
-                        <div className="row"><span>ローン返済額</span> <strong>{result.monthlyPayment.toLocaleString()}円</strong></div>
-                        <div className="row"><span>維持費等</span> <strong>{result.monthlyMaintenanceCost.toLocaleString()}円</strong></div>
-                        <div className="row"><span className="font-bold">月額合計</span> <span className="highlight">{result.totalMonthlyCost.toLocaleString()}円</span></div>
+                        <div className="row"><span>ローン返済額</span> <strong>{result?.monthlyPayment?.toLocaleString() ?? 0}円</strong></div>
+                        <div className="row"><span>維持費等</span> <strong>{result?.monthlyMaintenanceCost?.toLocaleString() ?? 0}円</strong></div>
+                        <div className="row"><span className="font-bold">月額合計</span> <span className="highlight">{result?.totalMonthlyCost?.toLocaleString() ?? 0}円</span></div>
                     </div>
                 </div>
             </div>

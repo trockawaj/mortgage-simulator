@@ -15,7 +15,7 @@ const InputGroup = ({ label, icon: Icon, value, onChange, min, max, step, unit, 
                     <input
                         type="number"
                         value={value}
-                        onChange={(e) => onChange(Number(e.target.value))}
+                        onChange={(e) => onChange(Number(e?.target?.value ?? 0))}
                         className="bg-transparent text-right text-xl font-bold text-gray-800 outline-none w-24 border-b-2 border-gray-200 focus:border-indigo-500 transition-colors"
                         min={min}
                         max={max}
@@ -31,7 +31,7 @@ const InputGroup = ({ label, icon: Icon, value, onChange, min, max, step, unit, 
                 max={max}
                 step={step}
                 value={value}
-                onChange={(e) => onChange(Number(e.target.value))}
+                onChange={(e) => onChange(Number(e?.target?.value ?? 0))}
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-500 hover:accent-indigo-400 transition-all"
             />
 
