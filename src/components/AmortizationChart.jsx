@@ -25,9 +25,20 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const AmortizationChart = ({ data, educationPeriods = [], startAge = 35 }) => {
     const [isMounted, setIsMounted] = React.useState(false);
+    const [chartWidth, setChartWidth] = React.useState(600);
 
     React.useEffect(() => {
         setIsMounted(true);
+        // 簡易的なレスポンシブ対応: ウィンドウ幅に合わせてグラフ幅を調整
+        // ResponsiveContainerを使わずにエラーを回避するため、計算済みの値を渡す
+        const updateWidth = () => {
+            const width = Math.min(window.innerWidth - 40, 800); // パディング分を考慮
+            setChartWidth(width > 0 ? width : 300);
+        };
+
+        updateWidth();
+        window.addEventListener('resize', updateWidth);
+        return () => window.removeEventListener('resize', updateWidth);
     }, []);
 
     if (!data || data.length === 0) return null;
@@ -47,73 +58,73 @@ const AmortizationChart = ({ data, educationPeriods = [], startAge = 35 }) => {
                 </span>
             </h2>
 
-            {/* User requested strict inline styles to prevent size calculation errors */}
-            <div style={{ width: '100%', height: '400px', minHeight: '400px' }}>
-                <ResponsiveContainer width="100%" height="100%" minWidth={0} debounce={50}>
-                    <AreaChart
-                        data={data}
-                        margin={{
-                            top: 10,
-                            right: 30,
-                            left: 0,
-                            bottom: 0,
+            {/* User requested strict inline styles and removal of ResponsiveContainer */}
+            <div style={{ width: '100%', height: '400px', display: 'block', overflowX: 'auto' }}>
+                <AreaChart
+                    width={chartWidth}
+                    height={400}
+                    data={data}
+                    margin={{
+                        top: 10,
+                        right: 30,
+                        left: 0,
+                        bottom: 0,
+                    }}
+                >
+                    <defs>
+                        <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                        </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} />
+                    <XAxis
+                        dataKey="month"
+                        stroke="#9ca3af"
+                        tickFormatter={(val) => {
+                            if (val % 60 === 0 || val === 0) {
+                                const yearsPassed = val / 12;
+                                return `${yearsPassed}年 (${startAge + yearsPassed}歳)`;
+                            }
+                            return '';
                         }}
-                    >
-                        <defs>
-                            <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                            </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} />
-                        <XAxis
-                            dataKey="month"
-                            stroke="#9ca3af"
-                            tickFormatter={(val) => {
-                                if (val % 60 === 0 || val === 0) {
-                                    const yearsPassed = val / 12;
-                                    return `${yearsPassed}年 (${startAge + yearsPassed}歳)`;
-                                }
-                                return '';
+                        minTickGap={30}
+                        height={50}
+                        tick={{ fontSize: 12 }}
+                    />
+                    <YAxis
+                        stroke="#9ca3af"
+                        tickFormatter={(val) => `${val / 10000}万`}
+                        width={60}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend />
+
+                    <Area
+                        type="monotone"
+                        dataKey="balance"
+                        stackId="1"
+                        stroke="#6366f1"
+                        fill="url(#colorBalance)"
+                        name="ローン残高"
+                    />
+
+                    {educationPeriods.map((period, index) => (
+                        <ReferenceArea
+                            key={index}
+                            x1={period.startMonth}
+                            x2={period.endMonth}
+                            fill={period.type === 'high_school' ? '#ec4899' : '#6366f1'}
+                            fillOpacity={0.15}
+                            label={{
+                                value: period.label,
+                                position: 'insideTop',
+                                fill: period.type === 'high_school' ? '#fbcfe8' : '#c7d2fe',
+                                fontSize: 12
                             }}
-                            minTickGap={30}
-                            height={50}
-                            tick={{ fontSize: 12 }}
                         />
-                        <YAxis
-                            stroke="#9ca3af"
-                            tickFormatter={(val) => `${val / 10000}万`}
-                            width={60}
-                        />
-                        <Tooltip content={<CustomTooltip />} />
-                        <Legend />
-
-                        <Area
-                            type="monotone"
-                            dataKey="balance"
-                            stackId="1"
-                            stroke="#6366f1"
-                            fill="url(#colorBalance)"
-                            name="ローン残高"
-                        />
-
-                        {educationPeriods.map((period, index) => (
-                            <ReferenceArea
-                                key={index}
-                                x1={period.startMonth}
-                                x2={period.endMonth}
-                                fill={period.type === 'high_school' ? '#ec4899' : '#6366f1'}
-                                fillOpacity={0.15}
-                                label={{
-                                    value: period.label,
-                                    position: 'insideTop',
-                                    fill: period.type === 'high_school' ? '#fbcfe8' : '#c7d2fe',
-                                    fontSize: 12
-                                }}
-                            />
-                        ))}
-                    </AreaChart>
-                </ResponsiveContainer>
+                    ))}
+                </AreaChart>
             </div>
         </div>
     );
