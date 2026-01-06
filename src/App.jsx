@@ -5,6 +5,9 @@ import ArticleList from './components/ArticleList';
 import OperatorInfo from './components/OperatorInfo';
 import Contact from './components/Contact';
 import ToolGuide from './components/ToolGuide';
+import { Home } from 'lucide-react';
+import ArticleDetail from './components/ArticleDetail';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 function App() {
   return (
