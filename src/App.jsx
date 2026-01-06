@@ -2,11 +2,9 @@ import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import MortgageCalculator from './components/MortgageCalculator';
 import ArticleList from './components/ArticleList';
-import ContactForm from './components/ContactForm';
-import { Home } from 'lucide-react';
-
-import ArticleDetail from './components/ArticleDetail';
-import PrivacyPolicy from './components/PrivacyPolicy';
+import OperatorInfo from './components/OperatorInfo';
+import Contact from './components/Contact';
+import ToolGuide from './components/ToolGuide';
 
 function App() {
   return (
@@ -33,11 +31,19 @@ function App() {
       {/* Main Content */}
       <main className="bg-amber-50 min-h-[calc(100vh-64px-300px)]">
         <Routes>
-          <Route path="/" element={<MortgageCalculator />} />
+          <Route path="/" element={
+            <>
+              <MortgageCalculator />
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <ToolGuide />
+              </div>
+            </>
+          } />
           <Route path="/articles" element={<ArticleList />} />
           <Route path="/articles/:id" element={<ArticleDetail />} />
-          <Route path="/contact" element={<ContactForm />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/operator" element={<OperatorInfo />} />
         </Routes>
       </main>
 
@@ -59,6 +65,7 @@ function App() {
                 <li><Link to="/articles" className="hover:text-indigo-600 transition-colors">記事一覧</Link></li>
                 <li><Link to="/contact" className="hover:text-indigo-600 transition-colors">お問い合わせ</Link></li>
                 <li><Link to="/privacy" className="hover:text-indigo-600 transition-colors">プライバシーポリシー</Link></li>
+                <li><Link to="/operator" className="hover:text-indigo-600 transition-colors">運営者情報</Link></li>
               </ul>
             </div>
             <div>
